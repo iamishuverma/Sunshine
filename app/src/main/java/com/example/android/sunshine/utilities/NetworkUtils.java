@@ -25,7 +25,8 @@ public final class NetworkUtils {
 
     private static final String SCHEME = "https";
     private static final String AUTHORITY = "api.openweathermap.org";
-    private static final String API_KEY = "968f9d38fa95270331bc5688692e0c9a";
+    private static final String API_KEY = "********************************";                       // Not displaying actual API key on Github.
+
 
     /*
      * NOTE: These values only effect responses from OpenWeatherMap, NOT from the fake weather
