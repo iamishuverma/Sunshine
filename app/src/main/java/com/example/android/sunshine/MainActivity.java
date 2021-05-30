@@ -2,6 +2,7 @@
 package com.example.android.sunshine;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Path;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,12 +37,6 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
 
-    /*
-        We are using a field for Toasts so that we can refer to all toast messages using a common toast field,
-        and if user clicks on new list item while the previous toast is still running(or not null),
-        we can cancel that previous toast using this common toast field and store new toast in it.
-    */
-    private Toast mToast;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,15 +74,10 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
     @Override
     public void onClick(String weatherForDay) {
         Context context = this;
-
-        /*
-            If previous toast is still alive, cancel it to show new current toast message.
-        */
-        if(mToast != null)
-            mToast.cancel();
-
-        mToast = Toast.makeText(context, weatherForDay, Toast.LENGTH_SHORT);
-        mToast.show();
+        Class destinationClass = DetailActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
+        startActivity(intentToStartDetailActivity);
     }
 
     private void showWeatherDataView() {
