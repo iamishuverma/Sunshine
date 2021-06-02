@@ -78,7 +78,6 @@ public final class NetworkUtils {
         }
         catch (MalformedURLException e)
         {
-            Log.i(TAG, "Malformed URL");
             e.printStackTrace();
         }
 

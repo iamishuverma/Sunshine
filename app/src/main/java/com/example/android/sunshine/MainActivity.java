@@ -1,8 +1,11 @@
 
 package com.example.android.sunshine;
 
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.Intent;
+//import androidx.loader.content.Loader;
+import android.content.Loader;
 import android.graphics.Path;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,6 +27,7 @@ import com.example.android.sunshine.ForecastAdapter.ForecastAdapterOnClickHandle
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.utilities.NetworkUtils;
 import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
+import com.example.android.sunshine.FetchWeatherTaskLoader;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -30,12 +35,13 @@ import java.net.URL;
 import java.nio.channels.NonWritableChannelException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements ForecastAdapterOnClickHandler {
+public class MainActivity extends AppCompatActivity implements ForecastAdapterOnClickHandler, LoaderCallbacks<String[]> {
 
     private RecyclerView mRecyclerView;
     private ForecastAdapter mForecastAdapter;
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
+    private URL weatherRequestUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,18 +64,6 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
         loadWeatherData();
     }
 
-    private void loadWeatherData() {
-        showWeatherDataView();
-
-        double[] coordinates = SunshinePreferences.getLocationCoordinates(this);
-        Double[] locationCoordinates = new Double[2];
-        locationCoordinates[0] = Double.parseDouble(String.valueOf(coordinates[0]));
-        locationCoordinates[1] = Double.parseDouble(String.valueOf(coordinates[1]));
-
-        URL weatherRequestUrl = NetworkUtils.buildUrl(locationCoordinates[0], locationCoordinates[1]);
-        new FetchWeatherTask().execute(weatherRequestUrl);
-    }
-
     // Overriding onClick() method of ForecastAdapterOnClickHandler interface.
     @Override
     public void onClick(String weatherForDay) {
@@ -90,47 +84,43 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
-    private class FetchWeatherTask extends AsyncTask<URL, Void, String[]>
-    {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
+    @Override
+    public Loader<String[]> onCreateLoader(int i, Bundle bundle) {
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+        return new FetchWeatherTaskLoader(MainActivity.this, weatherRequestUrl);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<String[]> loader, String[] strings) {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+
+        if(strings != null) {
+            showWeatherDataView();
+            mForecastAdapter.setWeatherData(strings);
         }
-
-        @Override
-        protected String[] doInBackground(URL... params)
-        {
-            if(params.length == 0)
-                return null;
-
-            URL weatherRequestUrl = params[0];
-            Log.i("URL", weatherRequestUrl.toString());
-            try {
-                String jsonWeatherResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
-                String[] simpleJsonWeatherData = OpenWeatherJsonUtils.getSimpleWeatherStringsFromJson(MainActivity.this, jsonWeatherResponse);
-                return simpleJsonWeatherData;
-            }
-            catch (Exception e) {
-                Log.i(MainActivity.class.getSimpleName(), "Error in fetching response.");
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String[] weatherData) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-
-            if(weatherData != null) {
-                showWeatherDataView();
-                mForecastAdapter.setWeatherData(weatherData);
-            }
-            else {
-                showErrorMessage();
-            }
+        else {
+            showErrorMessage();
         }
     }
+
+    @Override
+    public void onLoaderReset(Loader<String[]> loader) {
+
+    }
+
+    private void loadWeatherData() {
+        showWeatherDataView();
+
+        double[] coordinates = SunshinePreferences.getLocationCoordinates(this);
+        Double[] locationCoordinates = new Double[2];
+        locationCoordinates[0] = Double.parseDouble(String.valueOf(coordinates[0]));
+        locationCoordinates[1] = Double.parseDouble(String.valueOf(coordinates[1]));
+
+        weatherRequestUrl = NetworkUtils.buildUrl(locationCoordinates[0], locationCoordinates[1]);
+
+        getLoaderManager().initLoader(1, null, this);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -144,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
 
         if (id == R.id.action_refresh) {
             mForecastAdapter.setWeatherData(null);
-            loadWeatherData();
+            getLoaderManager().restartLoader(1, null, this);
             return true;
         }
 
