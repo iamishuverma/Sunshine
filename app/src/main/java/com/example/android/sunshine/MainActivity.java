@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 //import androidx.loader.content.Loader;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.graphics.Path;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,13 +37,15 @@ import java.net.URL;
 import java.nio.channels.NonWritableChannelException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements ForecastAdapterOnClickHandler, LoaderCallbacks<String[]> {
+public class MainActivity extends AppCompatActivity implements ForecastAdapterOnClickHandler, LoaderCallbacks<String[]>,
+                                    SharedPreferences.OnSharedPreferenceChangeListener {
 
     private RecyclerView mRecyclerView;
     private ForecastAdapter mForecastAdapter;
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
     private URL weatherRequestUrl;
+    private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,30 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
 
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
         loadWeatherData();
+
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(PREFERENCES_HAVE_BEEN_UPDATED)
+        {
+            mForecastAdapter.setWeatherData(null);
+            getLoaderManager().restartLoader(1, null, this);
+            PREFERENCES_HAVE_BEEN_UPDATED = false;
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        PREFERENCES_HAVE_BEEN_UPDATED = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
     }
 
     // Overriding onClick() method of ForecastAdapterOnClickHandler interface.
@@ -132,9 +160,16 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_refresh) {
+        if (id == R.id.action_refresh)
+        {
             mForecastAdapter.setWeatherData(null);
             getLoaderManager().restartLoader(1, null, this);
+            return true;
+        }
+        if (id == R.id.action_settings)
+        {
+            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(startSettingsActivity);
             return true;
         }
 

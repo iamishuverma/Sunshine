@@ -1,4 +1,3 @@
-
 package com.example.android.sunshine.utilities;
 
 import android.content.ContentValues;

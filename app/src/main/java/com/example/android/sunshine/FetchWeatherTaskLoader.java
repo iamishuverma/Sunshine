@@ -9,16 +9,17 @@ import android.content.AsyncTaskLoader;
 
 import com.example.android.sunshine.utilities.NetworkUtils;
 import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
-
 import java.net.URL;
 
 public class FetchWeatherTaskLoader extends AsyncTaskLoader<String[]>
 {
-    private URL mqueryUrl = null;
+    private Context mContext;
+    private URL mQueryUrl = null;
     public FetchWeatherTaskLoader(Context context, URL queryUrl)
     {
         super(context);
-        mqueryUrl = queryUrl;
+        mContext = context;
+        mQueryUrl = queryUrl;
     }
 
     @Override
@@ -30,12 +31,13 @@ public class FetchWeatherTaskLoader extends AsyncTaskLoader<String[]>
     @Override
     public String[] loadInBackground()
     {
-        if(mqueryUrl == null)
+        Log.i("loadInBackground", "LOADING !!");
+        if(mQueryUrl == null)
             return null;
 
         try {
-            String jsonWeatherResponse = NetworkUtils.getResponseFromHttpUrl(mqueryUrl);
-            String[] simpleJsonWeatherData = OpenWeatherJsonUtils.getSimpleWeatherStringsFromJson(getContext(), jsonWeatherResponse);
+            String jsonWeatherResponse = NetworkUtils.getResponseFromHttpUrl(mQueryUrl);
+            String[] simpleJsonWeatherData = OpenWeatherJsonUtils.getSimpleWeatherStringsFromJson(mContext, jsonWeatherResponse);
             return simpleJsonWeatherData;
         }
         catch (Exception e) {

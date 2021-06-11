@@ -39,6 +39,8 @@ public final class SunshineWeatherUtils {
      * @return Formatted temperature String in the following form:
      * "21°C"
      */
+
+    // Metric = Celsius and Imperial = Fahrenheit
     public static String formatTemperature(Context context, double temperature) {
         int temperatureFormatResourceId = R.string.format_temperature_celsius;
 

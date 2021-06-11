@@ -15,12 +15,45 @@
     <string name="action_map">Map Location</string>
     <string name="action_share">Share</string>
 
+    <string name="action_settings">Settings</string>
+
     <!--Used in overflow menu to refresh weather data-->
     <string name="action_refresh">Refresh</string>
 
     <string name="error_message">
         An error has occurred. Please try again by clicking REFRESH
     </string>
+
+    <!-- - - - - - - - - - - -->
+    <!--Used by Preferences  -->
+    <!-- - - - - - - - - - - -->
+
+    <!-- Label for the location preference [CHAR LIMIT=30] -->
+    <string name="pref_location_label">Location</string>
+
+    <!-- Key name for storing location in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_location_key" translatable="false">location</string>
+
+    <!-- Default postal code for location preference [CHAR LIMIT=NONE] -->
+    <string name="pref_location_default" translatable="false">190006 Srinagar, India</string>
+
+    <!-- Label for the temperature units preference [CHAR LIMIT=30] -->
+    <string name="pref_units_label">Temperature Units</string>
+
+    <!-- Label for metric option in temperature unit preference [CHAR LIMIT=25] -->
+    <string name="pref_units_label_metric">Metric</string>
+
+    <!-- Label for imperial option in temperature unit preference [CHAR LIMIT=25] -->
+    <string name="pref_units_label_imperial">Imperial</string>
+
+    <!-- Key name for temperature unit preference in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_units_key" translatable="false">units</string>
+
+    <!-- Value in SharedPreferences for metric temperature unit option [CHAR LIMIT=NONE] -->
+    <string name="pref_units_metric" translatable="false">metric</string>
+
+    <!-- Value in SharedPreferences for imperial temperature unit option [CHAR LIMIT=NONE] -->
+    <string name="pref_units_imperial" translatable="false">imperial</string>
 
     <!-- - - - - - - - - - - - - -->
     <!--Used by SunshineDateUtils-->
@@ -121,6 +154,20 @@
     <string name="condition_962">Hurricane</string>
 
     <string name="condition_unknown">Unknown (<xliff:g id="conditionId">%1$d</xliff:g>)</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
 
     <!-- - - - - - - - - - - -->
