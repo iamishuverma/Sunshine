@@ -1,4 +1,3 @@
-
 package com.example.android.sunshine;
 
 import android.app.LoaderManager.LoaderCallbacks;
